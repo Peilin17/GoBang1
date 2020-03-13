@@ -1,5 +1,9 @@
 package com.example.gobang
 
+/*
+test push Xiaolin
+ */
+
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 
