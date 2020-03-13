@@ -1,5 +1,5 @@
 package com.example.gobang
 
 /**
- * test git
+ * test git 2
  */
