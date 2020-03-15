@@ -1,21 +1,24 @@
 package com.example.gobang
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory.decodeResource
+import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Point
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 
 
-class chessboardView : View {
+class chessboardView :
+    View {
     // 棋盘的宽度，也是长度
-    private val mViewWidth = 0
+    private var mViewWidth = 0
 
     // 棋盘每格的长度
-    private val maxLineHeight = 0f
+    private var maxLineHeight = 0f
     private val paint: Paint = Paint()
 
     // 定义黑白棋子的Bitmap
@@ -25,19 +28,24 @@ class chessboardView : View {
     private val ratioPieceOfLineHeight = 3 * 1.0f / 4
 
     // 判断当前落下的棋子是否是白色的
-    private val mIsWhite = true
+    private var mIsWhite = true
 
     // 记录黑白棋子位置的列表
     private val mwhiteArray: ArrayList<Point> = ArrayList()
     private val mblackArray: ArrayList<Point> = ArrayList()
 
     // 游戏是否结束
-    private val mIsGameOver = false
+    private var mIsGameOver = false
 
     // 游戏结束，是否是白色方胜利
-    private val mIsWhiteWinner = false
+    private var mIsWhiteWinner = false
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+
+    constructor(
+        context: Context?,
+        attrs: AttributeSet?
+    ) : super(context, attrs) {
+
         init()
     }
 
@@ -51,6 +59,132 @@ class chessboardView : View {
         mwhitePiece = decodeResource(resources, R.mipmap.white)
         mblackPiece = decodeResource(resources, R.mipmap.black)
     }
+
+    //获取自定义的长宽
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
+        val widthModel = MeasureSpec.getMode(widthMeasureSpec)
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+        val heightModel = MeasureSpec.getMode(heightMeasureSpec)
+        var width = Math.min(widthSize, heightSize)
+        if (widthModel == MeasureSpec.UNSPECIFIED) {
+            width = heightSize
+        } else if (heightModel == MeasureSpec.UNSPECIFIED) {
+            width = widthSize
+        }
+        setMeasuredDimension(width, width)
+    }
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+        // 绘制棋盘的网格
+        drawBoard(canvas!!)
+        // 绘制棋盘的黑白棋子
+        drawPieces(canvas!!)
+        // 检查游戏是否结束
+        checkGameOver()
+    }
+
+    // 根据黑白棋子的数组绘制棋子
+    private fun drawPieces(canvas: Canvas) {
+        run {
+            var i = 0
+            val n = mwhiteArray.size
+            while (i < n) {
+                val whitePoint = mwhiteArray[i]
+                val left =
+                    (whitePoint.x + (1 - ratioPieceOfLineHeight) / 2) * maxLineHeight
+                val top =
+                    (whitePoint.y + (1 - ratioPieceOfLineHeight) / 2) * maxLineHeight
+                canvas.drawBitmap(mwhitePiece!!, left, top, null)
+                i++
+            }
+        }
+        var i = 0
+        val n = mblackArray.size
+        while (i < n) {
+            val blackPoint = mblackArray[i]
+            val left =
+                (blackPoint.x + (1 - ratioPieceOfLineHeight) / 2) * maxLineHeight
+            val top =
+                (blackPoint.y + (1 - ratioPieceOfLineHeight) / 2) * maxLineHeight
+            canvas.drawBitmap(mblackPiece!!, left, top, null)
+            i++
+        }
+    }
+
+    // 绘制棋盘的网线
+    private fun drawBoard(canvas: Canvas) {
+        val w = mViewWidth
+        val lineHeight = maxLineHeight
+        for (i in 0 until MAX_LINE) {
+            val startX = (lineHeight / 2).toInt()
+            val endX = (w - lineHeight / 2).toInt()
+            val y = ((0.5 + i) * lineHeight).toInt()
+            canvas.drawLine(startX.toFloat(), y.toFloat(), endX.toFloat(), y.toFloat(), paint)
+            canvas.drawLine(y.toFloat(), startX.toFloat(), y.toFloat(), endX.toFloat(), paint)
+        }
+    }
+
+    // 检查游戏是否结束
+    private fun checkGameOver() {
+        val checkWinner = checkWinner()
+        val whiteWin: Boolean = checkWinner.checkFiveInLineWinner(mwhiteArray)
+        val blackWin: Boolean = checkWinner.checkFiveInLineWinner(mblackArray)
+        if (whiteWin || blackWin) {
+            mIsGameOver = true
+            mIsWhiteWinner = whiteWin
+            val text = if (mIsWhiteWinner) "White WIN!" else "Black WIN!"
+            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+        }
+    }
+    //根据棋盘大小绘制棋子
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        mViewWidth = w
+        maxLineHeight = mViewWidth * 1.0f / MAX_LINE
+        val pieceWidth = (maxLineHeight * ratioPieceOfLineHeight).toInt()
+        mwhitePiece = Bitmap.createScaledBitmap(mwhitePiece!!, pieceWidth, pieceWidth, false)
+        mblackPiece = Bitmap.createScaledBitmap(mblackPiece!!, pieceWidth, pieceWidth, false)
+    }
+    //落子
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (mIsGameOver) {
+            return false
+        }
+        val action = event.action
+        if (action == MotionEvent.ACTION_UP) {
+            val x = event.x.toInt()
+            val y = event.y.toInt()
+            val point = getValidPoint(x, y)
+            if (mwhiteArray.contains(point) || mblackArray.contains(point)) {
+                return false
+            }
+            if (mIsWhite) {
+                mwhiteArray.add(point)
+            } else {
+                mblackArray.add(point)
+            }
+            invalidate()
+            mIsWhite = !mIsWhite
+        }
+        return true
+    }
+    //help method
+    private fun getValidPoint(x: Int, y: Int): Point {
+        val validX = (x / maxLineHeight).toInt()
+        val validY = (y / maxLineHeight).toInt()
+        return Point(validX, validY)
+    }
+
+    // restart
+    fun playAgain() {
+        mwhiteArray.clear()
+        mblackArray.clear()
+        mIsGameOver = false
+        mIsWhiteWinner = false
+        invalidate()
+    }
+
 
 }
 

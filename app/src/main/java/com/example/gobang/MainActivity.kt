@@ -11,10 +11,6 @@ import android.view.MenuItem
 import android.widget.SearchView
 const val  MAX_COUNT_IN_LINE = 5
 const val MAX_LINE = 15
-const val HORIZONTAL = 0
-const val VERTICAL = 1
-const val LEFT_DIAGONAL = 2
-const val RIGHT_DIAGONAL = 4
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.action_setting ->{
-                //adapter.showLike(model.getLike())
+                findViewById<chessboardView>(R.id.boardView).playAgain()
             }
 
         }
