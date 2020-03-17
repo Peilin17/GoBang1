@@ -4,7 +4,7 @@ import android.graphics.Point
 
 class checkWinner {
     private var point1: Point? = null
-    private  var point2:Point? = null
+    private var point2: Point? = null
 
     fun checkFiveInLineWinner(points: List<Point>): Boolean {
         for (point in points) {
@@ -63,15 +63,6 @@ class checkWinner {
     ): Boolean {
         return check(x, y, points, "RIGHT_DIAGONAL")
     }
-
-
-
-
-
-
-
-
-
 
 
     private fun check(

@@ -1,4 +1,4 @@
-package com.example.gobang
+package com.example.gobang.com.example.gobang
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -10,9 +10,13 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.example.gobang.AI
+import com.example.gobang.MAX_LINE
+import com.example.gobang.R
+import com.example.gobang.checkWinner
 
 
-class chessboardView :
+class AIChessboardView :
     View {
     // 棋盘的宽度，也是长度
     private var mViewWidth = 0
@@ -56,8 +60,14 @@ class chessboardView :
         paint.isAntiAlias = true
         paint.isDither = true
         paint.style = Paint.Style.STROKE
-        mwhitePiece = decodeResource(resources, R.mipmap.white)
-        mblackPiece = decodeResource(resources, R.mipmap.black)
+        mwhitePiece = decodeResource(
+            resources,
+            R.mipmap.white
+        )
+        mblackPiece = decodeResource(
+            resources,
+            R.mipmap.black
+        )
     }
 
     //获取自定义的长宽
@@ -77,10 +87,13 @@ class chessboardView :
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+
         // 绘制棋盘的网格
         drawBoard(canvas!!)
+
         // 绘制棋盘的黑白棋子
         drawPieces(canvas!!)
+
         // 检查游戏是否结束
         checkGameOver()
     }
@@ -167,17 +180,23 @@ class chessboardView :
             val x = event.x.toInt()
             val y = event.y.toInt()
             val point = getValidPoint(x, y)
+
             if (mwhiteArray.contains(point) || mblackArray.contains(point)) {
                 return false
             }
             if (mIsWhite) {
                 mwhiteArray.add(point)
-            } else {
-                mblackArray.add(point)
+                mIsWhite = !mIsWhite
+
+                //after user pick point, AI pick a point
+                val ai = AI(mwhiteArray, mblackArray)
+                mblackArray.add(ai.getNextPoint())
+                mIsWhite = !mIsWhite
             }
+
             invalidate()
-            mIsWhite = !mIsWhite
         }
+        checkGameOver()
         return true
     }
 
@@ -196,7 +215,7 @@ class chessboardView :
         mIsWhiteWinner = false
         mIsWhite = true
         invalidate()
-        Toast.makeText(context, "in Battle Mode", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "in A.I. Mode", Toast.LENGTH_SHORT).show()
     }
 
 
