@@ -1,6 +1,8 @@
 package com.example.gobang
 
 import android.graphics.Point
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class AI {
@@ -8,8 +10,10 @@ class AI {
     private var userArray: ArrayList<Point> = ArrayList()
 
     constructor(userlist: ArrayList<Point>, ailist: ArrayList<Point>) {
-        userArray = userlist
-        aiArray = ailist
+        userArray.addAll(userlist)
+        userArray.reverse()
+        aiArray.addAll(ailist)
+        aiArray.reverse()
     }
 
     // chessboard view can call this function to find the best point to play
@@ -17,27 +21,14 @@ class AI {
 
         var res = Point(-1, -1)
 
-        //check if I have 5 connected points
-        res = checkPosiblePoint(aiArray, 5)
+        //check if I have 4 connected points
+        res = checkPosiblePoint(aiArray, 4)
         if (isValid(res)) {
             return res
         }
-
-        //check if human has 5 connected points
-        res = checkPosiblePoint(userArray, 5)
-        if (isValid(res)) {
-            return res
-        }
-
 
         //check if human has 4 connected points
         res = checkPosiblePoint(userArray, 4)
-        if (isValid(res)) {
-            return res
-        }
-
-        //check if I have 4 connected points
-        res = checkPosiblePoint(aiArray, 4)
         if (isValid(res)) {
             return res
         }
@@ -65,13 +56,13 @@ class AI {
         }
 
         //check if human has 1 point, add to next
-        res = checkPosiblePoint(userArray, 1)
+        res = onepice(userArray[0])
         if (isValid(res)) {
             return res
         }
 
         //check if I have 1 point and add to next
-        res = checkPosiblePoint(aiArray, 1)
+        res = onepice(aiArray[0])
         if (isValid(res)) {
             return res
         } else {
@@ -92,28 +83,123 @@ class AI {
 
     private fun checkPosiblePoint(points: List<Point>, numberInLine: Int): Point {
         var res = Point(-1, -1)
-        for (point in points) {
-            val x = point.x
-            val y = point.y
+        if (numberInLine == 1) {
+            return onepice(points[0])
+        } else {
+            for (point in points) {
+                val x = point.x
+                val y = point.y
 
-            res = checkHorizontal(x, y, points, numberInLine)
-            if (isValid(res)) {
-                return res
-            }
-            res = checkVertical(x, y, points, numberInLine)
-            if (isValid(res)) {
-                return res
-            }
-            res = checkLeftDiagonal(x, y, points, numberInLine)
-            if (isValid(res)) {
-                return res
-            }
-            res = checkRighttDiagonal(x, y, points, numberInLine)
-            if (isValid(res)) {
-                return res
+
+                res = checkHorizontal(x, y, points, numberInLine)
+                if (isValid(res)) {
+                    return res
+                }
+                res = checkVertical(x, y, points, numberInLine)
+                if (isValid(res)) {
+                    return res
+                }
+                res = checkLeftDiagonal(x, y, points, numberInLine)
+                if (isValid(res)) {
+                    return res
+                }
+                res = checkRighttDiagonal(x, y, points, numberInLine)
+                if (isValid(res)) {
+                    return res
+                }
             }
         }
         return res
+    }
+
+    private fun onepice(
+        point: Point
+    ): Point {
+        var res = Point(-1, -1)
+        var x = point.x
+        var y = point.y
+        if(x == 0 && y == 0){
+            res.x = 1
+            res.y = 1
+        }
+        else if(x == 0 && y == 14){
+            res.x = 1
+            res.y = 13
+        }
+        else if(x == 14 && y == 0){
+            res.x = 13
+            res.y = 1
+        }
+        else if(x == 14 && y == 14){
+            res.x = 13
+            res.y = 13
+        }
+        else{
+            while(true){
+                var rand = Random.nextInt(1, 9)
+                if(rand == 1){
+                    if(validAxis(x-1) && validAxis(y-1)){
+                        res.x = x-1
+                        res.y = y-1
+                        break
+                    }
+                }
+                else if(rand == 2){
+                    if(validAxis(x-1) && validAxis(y)){
+                        res.x = x-1
+                        res.y = y
+                        break
+                    }
+                }
+                else if(rand == 3){
+                    if(validAxis(x-1) && validAxis(y+1)){
+                        res.x = x-1
+                        res.y = y+1
+                        break
+                    }
+                }
+                else if(rand == 4){
+                    if(validAxis(x) && validAxis(y-1)){
+                        res.x = x
+                        res.y = y-1
+                        break
+                    }
+                }
+                else if(rand == 5){
+                    if(validAxis(x) && validAxis(y+1)){
+                        res.x = x
+                        res.y = y+1
+                        break
+                    }
+                }else if(rand == 6){
+                    if(validAxis(x+1) && validAxis(y-1)){
+                        res.x = x+1
+                        res.y = y-1
+                        break
+                    }
+                }
+                else if(rand == 7){
+                    if(validAxis(x+1) && validAxis(y)){
+                        res.x = x+1
+                        res.y = y
+                        break
+                    }
+                }
+                else if(rand == 8){
+                    if(validAxis(x+1) && validAxis(y+1)){
+                        res.x = x+1
+                        res.y = y+1
+                        break
+                    }
+                }
+            }
+        }
+        return res
+    }
+
+    private fun validAxis(temp: Int)
+    : Boolean {
+        return temp > -1 && temp < 15
     }
 
     // 横
@@ -130,7 +216,7 @@ class AI {
         var ysmall = 16
         var xbig = -2
         var ybig = -2
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point1 = Point(x - i, y)
             if (points.contains(point1)) {
                 if (x - i < xsmall) {
@@ -141,7 +227,7 @@ class AI {
                 break
             }
         }
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point2 = Point(x + i, y)
             if (points.contains(point2)) {
                 if (x + i > xbig) {
@@ -180,7 +266,7 @@ class AI {
         var ysmall = 16
         var xbig = -2
         var ybig = -2
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point1 = Point(x, y - i)
             if (points.contains(point1)) {
                 if (y - i < ysmall) {
@@ -191,7 +277,7 @@ class AI {
                 break
             }
         }
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point2 = Point(x, y + i)
             if (points.contains(point2)) {
                 if (y + i > ybig) {
@@ -230,7 +316,7 @@ class AI {
         var ysmall = 16
         var xbig = -2
         var ybig = -2
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point1 = Point(x - i, y + i)
             if (points.contains(point1)) {
                 if (x - i < xsmall) {
@@ -244,7 +330,7 @@ class AI {
                 break
             }
         }
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point2 = Point(x + i, y - i)
             if (points.contains(point2)) {
                 if (x + i > xbig) {
@@ -288,7 +374,7 @@ class AI {
         var ysmall = 16
         var xbig = -2
         var ybig = -2
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point1 = Point(x + i, y + i)
             if (points.contains(point1)) {
                 if (x + i > xbig) {
@@ -302,7 +388,7 @@ class AI {
                 break
             }
         }
-        for (i in 0 until numberInLine) {
+        for (i in 1 until numberInLine) {
             point2 = Point(x - i, y - i)
             if (points.contains(point2)) {
                 if (x - i < xsmall) {

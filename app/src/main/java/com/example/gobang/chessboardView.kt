@@ -79,8 +79,10 @@ class chessboardView :
         super.onDraw(canvas)
         // 绘制棋盘的网格
         drawBoard(canvas!!)
+
         // 绘制棋盘的黑白棋子
         drawPieces(canvas!!)
+
         // 检查游戏是否结束
         checkGameOver()
     }
@@ -136,9 +138,8 @@ class chessboardView :
             mIsWhiteWinner = whiteWin
             val text = if (mIsWhiteWinner) "White WIN!" else "Black WIN!"
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
-        }
-        else{
-            if(mwhiteArray.size == 113 || mblackArray.size == 113 || (mwhiteArray.size + mblackArray.size) == 265){
+        } else {
+            if (mwhiteArray.size == 113 || mblackArray.size == 113 || (mwhiteArray.size + mblackArray.size) == 265) {
                 mIsGameOver = true
                 mIsWhiteWinner = whiteWin
                 val text = "Even!!!"
@@ -155,6 +156,26 @@ class chessboardView :
         val pieceWidth = (maxLineHeight * ratioPieceOfLineHeight).toInt()
         mwhitePiece = Bitmap.createScaledBitmap(mwhitePiece!!, pieceWidth, pieceWidth, false)
         mblackPiece = Bitmap.createScaledBitmap(mblackPiece!!, pieceWidth, pieceWidth, false)
+    }
+
+    // regret 悔棋
+    fun regretPlay() {
+        if (!mIsGameOver) {
+            var wsize = mwhiteArray.size
+            var bsize = mblackArray.size
+            if (mIsWhite) {
+                if (bsize > 0) {
+                    mblackArray.remove(mblackArray[bsize - 1])
+                    mIsWhite = !mIsWhite
+                }
+            } else {
+                if (wsize > 0) {
+                    mwhiteArray.remove(mwhiteArray[wsize - 1])
+                    mIsWhite = !mIsWhite
+                }
+            }
+            invalidate()
+        }
     }
 
     //落子
@@ -196,10 +217,17 @@ class chessboardView :
         mIsWhiteWinner = false
         mIsWhite = true
         invalidate()
-        Toast.makeText(context, "in Battle Mode", Toast.LENGTH_SHORT).show()
     }
 
-
+    fun switchModel() {
+        mwhiteArray.clear()
+        mblackArray.clear()
+        mIsGameOver = false
+        mIsWhiteWinner = false
+        mIsWhite = true
+        invalidate()
+        Toast.makeText(context, "in Battle Mode", Toast.LENGTH_SHORT).show()
+    }
 }
 
 

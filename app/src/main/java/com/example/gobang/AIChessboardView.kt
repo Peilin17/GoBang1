@@ -147,11 +147,16 @@ class AIChessboardView :
         if (whiteWin || blackWin) {
             mIsGameOver = true
             mIsWhiteWinner = whiteWin
-            val text = if (mIsWhiteWinner) "White WIN!" else "Black WIN!"
+            var text: String = ""
+            if (mIsWhiteWinner) {
+                text = "White WIN!"
+                mblackArray.remove(mblackArray[mblackArray.size - 1])
+            } else {
+                text = "Black WIN!"
+            }
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
-        }
-        else{
-            if(mwhiteArray.size == 113 || mblackArray.size == 113 || (mwhiteArray.size + mblackArray.size) == 265){
+        } else {
+            if (mwhiteArray.size == 113 || mblackArray.size == 113 || (mwhiteArray.size + mblackArray.size) == 265) {
                 mIsGameOver = true
                 mIsWhiteWinner = whiteWin
                 val text = "Even!!!"
@@ -168,6 +173,19 @@ class AIChessboardView :
         val pieceWidth = (maxLineHeight * ratioPieceOfLineHeight).toInt()
         mwhitePiece = Bitmap.createScaledBitmap(mwhitePiece!!, pieceWidth, pieceWidth, false)
         mblackPiece = Bitmap.createScaledBitmap(mblackPiece!!, pieceWidth, pieceWidth, false)
+    }
+
+    // regret what just played 悔棋
+    fun regretPlay() {
+        if (!mIsGameOver) {
+            var wsize = mwhiteArray.size
+            var bsize = mblackArray.size
+            if (wsize > 0 && bsize > 0) {
+                mwhiteArray.remove(mwhiteArray[wsize - 1])
+                mblackArray.remove(mblackArray[bsize - 1])
+            }
+            invalidate()
+        }
     }
 
     //落子
@@ -215,7 +233,17 @@ class AIChessboardView :
         mIsWhiteWinner = false
         mIsWhite = true
         invalidate()
+    }
+
+    fun switchModel() {
+        mwhiteArray.clear()
+        mblackArray.clear()
+        mIsGameOver = false
+        mIsWhiteWinner = false
+        mIsWhite = true
+        invalidate()
         Toast.makeText(context, "in A.I. Mode", Toast.LENGTH_SHORT).show()
+
     }
 
 

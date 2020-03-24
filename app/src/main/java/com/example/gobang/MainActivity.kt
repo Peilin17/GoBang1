@@ -22,13 +22,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if(isbattlemode){
+        if (isbattlemode) {
             battlemode_button.setTextColor(Color.RED)
             aimode_button.setTextColor(Color.BLACK)
             boardView.visibility = View.VISIBLE
             boardView2.visibility = View.GONE
-        }
-        else{
+        } else {
             aimode_button.setTextColor(Color.RED)
             battlemode_button.setTextColor(Color.BLACK)
             boardView2.visibility = View.VISIBLE
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             isbattlemode = false
             boardView2.visibility = View.VISIBLE
             boardView.visibility = View.GONE
-            findViewById<AIChessboardView>(R.id.boardView2).playAgain()
+            findViewById<AIChessboardView>(R.id.boardView2).switchModel()
         }
 
         // battle mode
@@ -55,9 +54,10 @@ class MainActivity : AppCompatActivity() {
             isbattlemode = true
             boardView.visibility = View.VISIBLE
             boardView2.visibility = View.GONE
-            findViewById<chessboardView>(R.id.boardView).playAgain()
+            findViewById<chessboardView>(R.id.boardView).switchModel()
         }
 
+        // restart button
         restart_button.setOnClickListener {
             if (isbattlemode) {
                 boardView.visibility = View.VISIBLE
@@ -69,13 +69,22 @@ class MainActivity : AppCompatActivity() {
                 findViewById<AIChessboardView>(R.id.boardView2).playAgain()
             }
         }
+
+        // regret button
+        regret_button.setOnClickListener {
+            if (isbattlemode) {
+                findViewById<chessboardView>(R.id.boardView).regretPlay()
+            } else {
+                findViewById<AIChessboardView>(R.id.boardView2).regretPlay()
+            }
+        }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_menu, menu)
-
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//        menuInflater.inflate(R.menu.action_menu, menu)
+//
+//        return true
+//    }
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 //
 //
