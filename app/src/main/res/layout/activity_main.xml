@@ -11,7 +11,8 @@
         android:id="@+id/background_imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_image_black_24dp" />
+        android:src="@mipmap/back"
+        tools:srcCompat="@mipmap/back" />
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
