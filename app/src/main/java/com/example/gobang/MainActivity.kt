@@ -4,24 +4,39 @@ package com.example.gobang
 test push Xiaolin
  */
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
+import android.os.*
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.view.Menu
+import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.gobang.com.example.gobang.AIChessboardView
 import kotlinx.android.synthetic.main.activity_main.*
-import android.Manifest
-import android.os.Build
-import android.os.Build.*
+import java.io.*
+import java.net.URL
+import java.util.*
+
 
 const val MAX_COUNT_IN_LINE = 5
 const val MAX_LINE = 15
 private var isbattlemode = true
+private var Path = "https://s3.amazonaws.com/appsdeveloperblog/Micky.jpg"
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -106,6 +121,43 @@ class MainActivity : AppCompatActivity() {
                 pickImageFromGallery();
             }
         }
+
+
+        download_button.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                // Permission is not granted
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
+                ) {
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                } else {
+                    // No explanation needed, we can request the permission.
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        55
+                    )
+                }
+            } else {
+                // Permission has already been granted
+//                Toast.makeText(this, "in 1st else", Toast.LENGTH_SHORT).show()
+                val externalStorageState = Environment.getExternalStorageState()
+                if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
+                    DonwloadSaveImg.donwloadImg(this, Path)
+                }
+            }
+        }
     }
 
     companion object {
@@ -115,7 +167,6 @@ class MainActivity : AppCompatActivity() {
         //Permission code
         private val PERMISSION_CODE = 1001;
     }
-
 
     private fun pickImageFromGallery() {
         //Intent to pick image
@@ -130,20 +181,42 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+//        Toast.makeText(this, "requestCode is : " + requestCode, Toast.LENGTH_SHORT).show()
         when (requestCode) {
-            PERMISSION_CODE -> {
-                if (grantResults.size > 0 && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED
-                ) {
-                    //permission from popup granted
+            1001 -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
                     pickImageFromGallery()
                 } else {
-                    //permission from popup denied
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
                 }
+                return
+            }
+
+            55 -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    DonwloadSaveImg.donwloadImg(this, Path)
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return
+            }
+
+            // Add other 'when' lines to check for other
+            // permissions this app might request.
+            else -> {
+                // Ignore all other requests.
             }
         }
     }
+
 
     //handle result of picked image
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -151,24 +224,82 @@ class MainActivity : AppCompatActivity() {
             background_imageview.setImageURI(data?.data)
         }
     }
+}
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        menuInflater.inflate(R.menu.action_menu, menu)
-//
-//        return true
-//    }
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//
-//
-//        when (item.itemId) {
-//            R.id.action_setting ->{
-//                boardView2.visibility = View.GONE
-//                boardView.visibility = View.VISIBLE
-//                findViewById<chessboardView>(R.id.boardView).playAgain()
-//            }
-//
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
 
+object DonwloadSaveImg {
+    private var context: Context? = null
+    private var filePath: String? = null
+    private var mBitmap: Bitmap? = null
+    private var mSaveMessage = "失败"
+    private const val TAG = "PictureActivity"
+    private var mSaveDialog: ProgressDialog? = null
+    fun donwloadImg(contexts: Context?, filePaths: String?) {
+        context = contexts
+        filePath = filePaths
+        mSaveDialog =
+            ProgressDialog.show(context, "保存图片", "图片正在保存中，请稍等...", true)
+        Thread(saveFileRunnable).start()
+    }
+
+    private val saveFileRunnable = Runnable {
+        try {
+            if (!TextUtils.isEmpty(filePath)) { //网络图片
+                // 对资源链接
+                val url = URL(filePath)
+                //打开输入流
+                val inputStream: InputStream = url.openStream()
+                //对网上资源进行下载转换位图图片
+                mBitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream.close()
+            }
+            saveFile(mBitmap)
+            mSaveMessage = "图片保存成功！"
+        } catch (e: IOException) {
+            mSaveMessage = "图片保存失败！"
+            e.printStackTrace()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        messageHandler.sendMessage(messageHandler.obtainMessage())
+    }
+    private val messageHandler: Handler = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message?) {
+            mSaveDialog!!.dismiss()
+            Log.d(TAG, mSaveMessage)
+            Toast.makeText(
+                context,
+                mSaveMessage,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    /**
+     * 保存图片
+     * @param bm
+     * @throws IOException
+     */
+    @Throws(IOException::class)
+    fun saveFile(bm: Bitmap?) {
+        val dirFile = File(Environment.getExternalStorageDirectory().getPath())
+        if (!dirFile.exists()) {
+            dirFile.mkdir()
+        }
+        val fileName: String = UUID.randomUUID().toString().toString() + ".jpg"
+        val myCaptureFile = File(
+            Environment.getExternalStorageDirectory().getPath()
+                .toString() + "/DCIM/Camera/" + fileName
+        )
+        val bos = BufferedOutputStream(FileOutputStream(myCaptureFile))
+        bm!!.compress(Bitmap.CompressFormat.JPEG, 80, bos)
+        bos.flush()
+        bos.close()
+        //把图片保存后声明这个广播事件通知系统相册有新图片到来
+        val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        val uri: Uri = Uri.fromFile(myCaptureFile)
+        intent.data = uri
+        context?.sendBroadcast(intent)
+    }
 }
