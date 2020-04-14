@@ -13,11 +13,10 @@ class UploadWorker(appContext: Context, workerParams: WorkerParameters)
         // Do the work here--in this case, upload user interaction history.
 
         val json = JSONObject()
-//        json.accumulate("username",inputData.getString("username"))
-//        json.accumulate("event",inputData.getString("event"))
-//        json.accumulate("seekBar 1",inputData.getLong("seekBar1", 0))
-//        json.accumulate("seekBar 2",inputData.getLong("seekBar2", 0))
-//        json.accumulate("seekBar 3",inputData.getLong("seekBar3", 0))
+        json.accumulate("username",inputData.getString("username"))
+        json.accumulate("color",inputData.getString("color"))
+        json.accumulate("x-coordinate",inputData.getInt("x", 0))
+        json.accumulate("y-coordinate",inputData.getInt("y", 0))
 
         Log.d(MainActivity.TAG, "params:"+json.toString()+ " url "+MainActivity.URL)
         return   uploadLog(json, MainActivity.URL)

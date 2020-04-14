@@ -4,26 +4,32 @@ package com.example.gobang
 test push Xiaolin
  */
 
+//import android.support.v4.app.ActivityCompat
+//import android.support.v4.content.ContextCompat
+//import android.support.v7.app.AppCompatActivity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
-import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-//import android.support.v4.app.ActivityCompat
-//import android.support.v4.content.ContextCompat
-//import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -47,6 +53,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
+
+        val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent != null) {
+                    if (intent.getBooleanExtra("state", false)) {
+                        findViewById<Button>(R.id.download_button).setBackgroundColor(Color.GRAY)
+                    }
+                    else
+                    {
+                        findViewById<Button>(R.id.download_button).setBackgroundColor(Color.GREEN)
+                    }
+                }
+            }
+        }
+
+        registerReceiver(receiver, intentFilter)
 
         if (isbattlemode) {
             battlemode_button.setTextColor(Color.RED)
@@ -85,6 +109,7 @@ class MainActivity : AppCompatActivity() {
 
         // restart button
         restart_button.setOnClickListener {
+
             if (isbattlemode) {
                 boardView.visibility = View.VISIBLE
                 boardView2.visibility = View.GONE
@@ -177,7 +202,49 @@ class MainActivity : AppCompatActivity() {
 
         const val TAG = "GoBang_TAG"
 
+        const val USERNAME = "GoBang"
+        val COMPLETE_INTENT = "complete intent"
+        //val MUSICNAME = "music name"
+
     }
+//    fun createDialog()
+//    {
+//        // build alert dialog
+//        val dialogBuilder = AlertDialog.Builder(this)
+//
+//        // set message of alert dialog
+//        dialogBuilder.setMessage("Do you want to try again ?")
+//            // if the dialog is cancelable
+//            .setCancelable(false)
+//            // positive button text and action
+//            .setPositiveButton("Yes", DialogInterface.OnClickListener {
+//                    dialog, id ->
+//                if (isbattlemode) {
+//                    boardView.visibility = View.VISIBLE
+//                    boardView2.visibility = View.GONE
+//                    findViewById<chessboardView>(R.id.boardView).playAgain()
+//                } else {
+//                    boardView2.visibility = View.VISIBLE
+//                    boardView.visibility = View.GONE
+//                    findViewById<AIChessboardView>(R.id.boardView2).playAgain()
+//                }
+//
+//
+//            })
+//            // negative button text and action
+//            .setNegativeButton("No", DialogInterface.OnClickListener {
+//                    dialog, id -> dialog.cancel()
+//            })
+//
+//        // create dialog box
+//        val alert = dialogBuilder.create()
+//        // set title for alert dialog box
+//        alert.setTitle("Confirm")
+//        // show alert dialog
+//        alert.show()
+//    } 已弃用 对话框
+
+
 
     private fun pickImageFromGallery() {
         //Intent to pick image
@@ -314,4 +381,11 @@ object DonwloadSaveImg {
         intent.data = uri
         context?.sendBroadcast(intent)
     }
+
+
+
+
+
+
+
 }

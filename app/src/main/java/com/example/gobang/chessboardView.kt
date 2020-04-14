@@ -1,6 +1,7 @@
 package com.example.gobang
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory.decodeResource
 import android.graphics.Canvas
@@ -10,6 +11,10 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 
 
 class chessboardView :
@@ -138,6 +143,8 @@ class chessboardView :
             mIsWhiteWinner = whiteWin
             val text = if (mIsWhiteWinner) "White WIN!" else "Black WIN!"
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+
+
         } else {
             if (mwhiteArray.size == 113 || mblackArray.size == 113 || (mwhiteArray.size + mblackArray.size) == 265) {
                 mIsGameOver = true
@@ -193,8 +200,10 @@ class chessboardView :
             }
             if (mIsWhite) {
                 mwhiteArray.add(point)
+                appendEvent("white", point.x, point.y)
             } else {
                 mblackArray.add(point)
+                appendEvent("black", point.x, point.y)
             }
             invalidate()
             mIsWhite = !mIsWhite
@@ -227,6 +236,15 @@ class chessboardView :
         mIsWhite = true
         invalidate()
         Toast.makeText(context, "in Battle Mode", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun appendEvent(color: String, x: Int, y: Int){
+
+        WorkManager.getInstance().beginUniqueWork(
+            MainActivity.TAG, ExistingWorkPolicy.KEEP, OneTimeWorkRequestBuilder<UploadWorker>().setInputData(
+                    workDataOf("username" to MainActivity.USERNAME, "color" to color, "x" to x, "y" to y)
+                )
+                .build()).enqueue()
     }
 }
 
