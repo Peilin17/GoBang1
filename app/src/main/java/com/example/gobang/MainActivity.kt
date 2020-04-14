@@ -18,13 +18,16 @@ import android.net.Uri
 import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
+//import android.support.v4.app.ActivityCompat
+//import android.support.v4.content.ContextCompat
+//import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.gobang.com.example.gobang.AIChessboardView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
@@ -39,6 +42,7 @@ private var Path = "https://s3.amazonaws.com/appsdeveloperblog/Micky.jpg"
 
 
 class MainActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,6 +170,13 @@ class MainActivity : AppCompatActivity() {
 
         //Permission code
         private val PERMISSION_CODE = 1001;
+        //upload route
+        const val URL = "https://posthere.io/"
+        //upload route key
+        const val ROUTE ="0ccd-4a3d-9d01"
+
+        const val TAG = "GoBang_TAG"
+
     }
 
     private fun pickImageFromGallery() {
@@ -220,6 +231,7 @@ class MainActivity : AppCompatActivity() {
 
     //handle result of picked image
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_PICK_CODE) {
             background_imageview.setImageURI(data?.data)
         }
