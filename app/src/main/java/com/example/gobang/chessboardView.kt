@@ -1,7 +1,6 @@
 package com.example.gobang
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory.decodeResource
 import android.graphics.Canvas
@@ -11,10 +10,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
+import androidx.lifecycle.ViewModelProvider
 
 
 class chessboardView :
@@ -200,10 +196,11 @@ class chessboardView :
             }
             if (mIsWhite) {
                 mwhiteArray.add(point)
-                appendEvent("white", point.x, point.y)
+                //var model = ViewModelProviders.of(MainActivity)(ViewModel::class.java)
+                //model.appendEvent("white", point.x, point.y)
             } else {
                 mblackArray.add(point)
-                appendEvent("black", point.x, point.y)
+                //appendEvent("black", point.x, point.y)
             }
             invalidate()
             mIsWhite = !mIsWhite
@@ -238,14 +235,14 @@ class chessboardView :
         Toast.makeText(context, "in Battle Mode", Toast.LENGTH_SHORT).show()
     }
 
-    private fun appendEvent(color: String, x: Int, y: Int){
-
-        WorkManager.getInstance().beginUniqueWork(
-            MainActivity.TAG, ExistingWorkPolicy.KEEP, OneTimeWorkRequestBuilder<UploadWorker>().setInputData(
-                    workDataOf("username" to MainActivity.USERNAME, "color" to color, "x" to x, "y" to y)
-                )
-                .build()).enqueue()
-    }
+//    private fun appendEvent(color: String, x: Int, y: Int){
+//
+//        WorkManager.getInstance().beginUniqueWork(
+//            MainActivity.TAG, ExistingWorkPolicy.KEEP, OneTimeWorkRequestBuilder<UploadWorker>().setInputData(
+//                    workDataOf("username" to MainActivity.USERNAME, "color" to color, "x" to x, "y" to y)
+//                )
+//                .build()).enqueue()
+//    }
 }
 
 

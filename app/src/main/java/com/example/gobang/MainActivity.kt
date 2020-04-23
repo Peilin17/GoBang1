@@ -34,6 +34,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.gobang.com.example.gobang.AIChessboardView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     else
                     {
-                        findViewById<Button>(R.id.download_button).setBackgroundColor(Color.GREEN)
+                        findViewById<Button>(R.id.download_button).setBackgroundColor(Color.LTGRAY)
                     }
                 }
             }
@@ -203,7 +204,7 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "GoBang_TAG"
 
         const val USERNAME = "GoBang"
-        val COMPLETE_INTENT = "complete intent"
+        //val COMPLETE_INTENT = "complete intent"
         //val MUSICNAME = "music name"
 
     }
