@@ -1,0 +1,2 @@
+rootProject.name='GoBang'
+include ':app'

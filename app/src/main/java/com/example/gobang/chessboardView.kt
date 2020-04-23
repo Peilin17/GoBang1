@@ -183,6 +183,7 @@ class chessboardView :
 
     //落子
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        //var model = ViewModelProvider().get(ViewModel::class.java)
         if (mIsGameOver) {
             return false
         }
@@ -196,11 +197,11 @@ class chessboardView :
             }
             if (mIsWhite) {
                 mwhiteArray.add(point)
-                //var model = ViewModelProviders.of(MainActivity)(ViewModel::class.java)
+
                 //model.appendEvent("white", point.x, point.y)
             } else {
                 mblackArray.add(point)
-                //appendEvent("black", point.x, point.y)
+                //model.appendEvent("black", point.x, point.y)
             }
             invalidate()
             mIsWhite = !mIsWhite
