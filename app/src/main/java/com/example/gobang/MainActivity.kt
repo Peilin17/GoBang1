@@ -46,6 +46,7 @@ const val MAX_COUNT_IN_LINE = 5
 const val MAX_LINE = 15
 private var isbattlemode = true
 private var Path = "https://s3.amazonaws.com/appsdeveloperblog/Micky.jpg"
+private var model: MyViewModel? = null
 
 
 class MainActivity : AppCompatActivity() {
@@ -54,9 +55,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
-
+        val factory = Factory()
+        model = ViewModelProvider(this, factory).get(MyViewModel::class.java)
         val receiver: BroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent != null) {
@@ -206,6 +207,10 @@ class MainActivity : AppCompatActivity() {
         const val USERNAME = "GoBang"
         //val COMPLETE_INTENT = "complete intent"
         //val MUSICNAME = "music name"
+        fun event(color: String, x: Int, y: Int)
+        {
+            model?.appendEvent(color, x, y)
+        }
 
     }
 //    fun createDialog()
@@ -244,6 +249,9 @@ class MainActivity : AppCompatActivity() {
 //        // show alert dialog
 //        alert.show()
 //    } 已弃用 对话框
+
+
+
 
 
 

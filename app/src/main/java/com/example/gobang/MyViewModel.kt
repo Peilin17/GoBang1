@@ -1,18 +1,18 @@
 package com.example.gobang
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-
-class ViewModel (application: Application): AndroidViewModel(application){
-    companion object{
-
+class MyViewModel: ViewModel(){
+    init {
 
     }
-    private fun appendEvent(color: String, x: Int, y: Int){
+    companion object{
+
+    }
+    fun appendEvent(color: String, x: Int, y: Int){
 
         WorkManager.getInstance().beginUniqueWork(
             MainActivity.TAG, ExistingWorkPolicy.KEEP, OneTimeWorkRequestBuilder<UploadWorker>().setInputData(
@@ -20,4 +20,6 @@ class ViewModel (application: Application): AndroidViewModel(application){
                 )
                 .build()).enqueue()
     }
+
 }
+
