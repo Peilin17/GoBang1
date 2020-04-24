@@ -4,7 +4,13 @@
     <string name="restart">restart</string>
     <string name="battle_mode">battle mode</string>
     <string name="regret">Regret</string>
-    <string name="background">Background</string>
+    <string name="background">Local</string>
+
+    <string-array name="backgroundselection_array">
+        <item>Click to change background</item>
+        <item>select local picture</item>
+        <item>use picture online</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
