@@ -1,8 +1,5 @@
 package com.example.gobang
 
-/*
-test push Xiaolin
- */
 
 //import android.support.v4.app.ActivityCompat
 //import android.support.v4.content.ContextCompat
@@ -11,10 +8,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -28,8 +22,10 @@ import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -137,27 +133,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // no longer need it, replace it with spinner implemented below
-        // change background button
-//        changebackground_button.setOnClickListener {
-//            //check runtime permission
-//            if (VERSION.SDK_INT >= VERSION_CODES.M) {
-//                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
-//                    PackageManager.PERMISSION_DENIED
-//                ) {
-//                    //permission denied
-//                    val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE);
-//                    //show popup to request runtime permission
-//                    requestPermissions(permissions, PERMISSION_CODE);
-//                } else {
-//                    //permission already granted
-//                    pickImageFromGallery();
-//                }
-//            } else {
-//                //system OS is < Marshmallow
-//                pickImageFromGallery();
-//            }
-//        }
+
 
 
         //download button
@@ -279,42 +255,35 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-//    fun createDialog()
-//    {
-//        // build alert dialog
-//        val dialogBuilder = AlertDialog.Builder(this)
-//
-//        // set message of alert dialog
-//        dialogBuilder.setMessage("Do you want to try again ?")
-//            // if the dialog is cancelable
-//            .setCancelable(false)
-//            // positive button text and action
-//            .setPositiveButton("Yes", DialogInterface.OnClickListener {
-//                    dialog, id ->
-//                if (isbattlemode) {
-//                    boardView.visibility = View.VISIBLE
-//                    boardView2.visibility = View.GONE
-//                    findViewById<chessboardView>(R.id.boardView).playAgain()
-//                } else {
-//                    boardView2.visibility = View.VISIBLE
-//                    boardView.visibility = View.GONE
-//                    findViewById<AIChessboardView>(R.id.boardView2).playAgain()
-//                }
-//
-//
-//            })
-//            // negative button text and action
-//            .setNegativeButton("No", DialogInterface.OnClickListener {
-//                    dialog, id -> dialog.cancel()
-//            })
-//
-//        // create dialog box
-//        val alert = dialogBuilder.create()
-//        // set title for alert dialog box
-//        alert.setTitle("Confirm")
-//        // show alert dialog
-//        alert.show()
-//    } 已弃用 对话框
+
+    var diaListener: DialogInterface.OnClickListener =
+        DialogInterface.OnClickListener { dialog, buttonId -> // TODO Auto-generated method stub
+            when (buttonId) {
+                AlertDialog.BUTTON_POSITIVE -> finish()
+                AlertDialog.BUTTON_NEGATIVE -> {
+                }
+                else -> {
+                }
+            }
+        }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            //back key Constant Value: 4 (0x00000004)
+            //创建退出对话框
+            val isExit: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
+            //设置对话框标题
+            isExit.setTitle("Message")
+            //设置对话框消息
+            isExit.setMessage("You want to quit?")
+            // 添加选择按钮并注册监听
+            isExit.setPositiveButton("Yes", diaListener)
+            isExit.setNegativeButton("No", diaListener)
+            //对话框显示
+            isExit.show()
+        }
+        return false
+    }
 
 
     private fun pickImageFromGallery() {
