@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoBang</string>
+    <string name="app_name">Gomoku</string>
     <string name="a_i_mode">A.I. Mode</string>
     <string name="restart">restart</string>
     <string name="battle_mode">battle mode</string>

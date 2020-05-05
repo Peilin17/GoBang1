@@ -369,7 +369,7 @@ object DonwloadSaveImg {
 
     private val saveFileRunnable = Runnable {
         try {
-            if (!TextUtils.isEmpty(filePath)) { //网络图片
+            if (!TextUtils.isEmpty(filePath)) { //online image
                 // 对资源链接
                 val url = URL(filePath)
                 //打开输入流
@@ -421,7 +421,7 @@ object DonwloadSaveImg {
         bm!!.compress(Bitmap.CompressFormat.JPEG, 80, bos)
         bos.flush()
         bos.close()
-        //把图片保存后声明这个广播事件通知系统相册有新图片到来
+        //broadcast the new image is here
         val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
         val uri: Uri = Uri.fromFile(myCaptureFile)
         intent.data = uri
